@@ -1,21 +1,22 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import *
-from PyQt5.QtPrintSupport import *
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QWidget, QFileDialog, QMenuBar, QMessageBox, QColorDialog
+from PyQt5.QtPrintSupport import QPrintDialog
 import sys
-from PyQt5.QtGui import QIcon
-import os
+
 
 class Window(QMainWindow, QWidget):
-    """" """
+    """" Создание основного класса """
+
     def __init__(self):
         super(Window, self).__init__()
 
-        self.setWindowTitle("Текстовый редактор")
-        self.setWindowIcon(QtGui.QIcon('lo.png'))
-        self.setGeometry(420, 250, 500, 350)
+        self.setWindowTitle("Текстовый редактор") # Заголовок окна
+        self.setWindowIcon(QtGui.QIcon('lo.png')) # Иконка окна
+        self.setGeometry(420, 250, 500, 350) # Размер и расположение окна
 
-        self.text = QtWidgets.QTextEdit(self)
+        self.text = QtWidgets.QTextEdit(self) # Создание поля для редактирования
         self.setCentralWidget(self.text)
+
         self.createMenuBar()
 
         self.flag = 0
@@ -23,9 +24,13 @@ class Window(QMainWindow, QWidget):
 
 
     def createMenuBar(self):
+        """ Добавление меню """
+
+        # Создание меню
         self.menuBar = QMenuBar(self)
         self.setMenuBar(self.menuBar)
 
+        # Создание элементов меню
         self.fileMenu = QMenu("&Файл", self)
         self.menuBar.addMenu(self.fileMenu)
 
@@ -38,6 +43,7 @@ class Window(QMainWindow, QWidget):
         self.fileMenu4 = QMenu("&Тема", self)
         self.menuBar.addMenu(self.fileMenu4)
 
+        # Создание подпунктов меню
         self.fileMenu.addAction("Новый файл", self.action_clicked)
         self.fileMenu.addAction("Открыть", self.action_clicked)
         self.fileMenu.addAction("Сохранить", self.action_clicked)
@@ -61,9 +67,13 @@ class Window(QMainWindow, QWidget):
         self.fileMenu4.addAction("Темная", self.action_clicked)
 
 
-    @QtCore.pyqtSlot()
+    @QtCore.pyqtSlot() # Аннотация, которая обрабатывает нажатия на пункты меню
     def action_clicked(self):
-        action = self.sender()
+        """ Обработка нажатий на кнопки меню """
+
+        action = self.sender() # Получение информации об объекте
+
+        # Открытие файла
         if action.text() == "Открыть":
             fname, _ = QFileDialog.getOpenFileName(self, "Open file", "",
                             "Text documents (*.txt)")
@@ -75,6 +85,7 @@ class Window(QMainWindow, QWidget):
             except FileNotFoundError:
                 return
 
+        # Сохранение файла
         elif action.text() == "Сохранить":
             fname, _ = QFileDialog.getSaveFileName(self, "Save file", "",
                             "Text documents (*.txt)")
@@ -86,23 +97,28 @@ class Window(QMainWindow, QWidget):
             except FileNotFoundError:
                 return
 
+        # Создание нового файла
         elif action.text() == "Новый файл":
             self.text.setText("")
 
+        # Выбор шрифта
         elif action.text() == "Шрифт":
             font, ok = QtWidgets.QFontDialog.getFont(self.text.currentFont(), self)
             if not ok:
                 return
             self.text.setFont(font)
 
+        # Печать файла
         elif action.text() == "Печать":
             dlg = QPrintDialog()
             try:
                 if dlg.exec_():
                     self.editor.print_(dlg.printer())
             except:
-                QMessageBox.about(self, "Ошибка!", "Невозможно начать печать. \nДля продолжения работы закройте это окно.\t")
+                QMessageBox.about(self, "Ошибка!", "Невозможно начать печать. "
+                                                   "\nДля продолжения работы закройте это окно.\t")
 
+        # Цвет фона
         elif action.text() == "Черный":
             self.text.setStyleSheet("background-color: #000000;")
             self.text.setAutoFillBackground(True)
@@ -141,7 +157,7 @@ class Window(QMainWindow, QWidget):
             self.flag = 6
             self.flag2 = 1
 
-
+        # Цвет шрифта
         elif action.text() == "Цвет шрифта":
             if self.flag2 == 0:
                 QMessageBox.about(self, "Ошибка!",
@@ -165,22 +181,27 @@ class Window(QMainWindow, QWidget):
                         self.text.setStyleSheet("QWidget { color: %s; background-color: #FFFFFF}" % col.name())
 
 
+        # Определение темы
         elif action.text() == "Темная":
             self.text.setStyleSheet("QWidget { color: #35E917; background-color: #111111}")
 
         elif action.text() == "Светлая":
             self.text.setStyleSheet("QWidget { color: #000000; background-color: #FFFFFF}")
 
+        # Копирование текста
         elif action.text() == "Копировать":
             save_text = self.text.toPlainText()
             clipboard = QApplication.clipboard()
             clipboard.setText(save_text)
 
+        # Вставка текста
         elif action.text() == "Вставить":
             textt = QApplication.clipboard().text()
             self.text.insertPlainText(textt + '\n')
 
 def application():
+    """ Создание оснвного метода """
+
     app = QApplication(sys.argv)
     window = Window()
     window.show()
