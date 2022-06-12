@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QWidget, QFileDialog, QMenuBar, QMessageBox, QColorDialog
 from PyQt5.QtPrintSupport import QPrintDialog
@@ -92,13 +94,14 @@ class Window(QMainWindow, QWidget):
             try:
                 with open(fname, 'w') as f:
                     save_text = self.text.toPlainText()
-                    f.write(save_text)
+                    f.write(save_text.encode('utf-8').decode('utf-8'))
 
             except FileNotFoundError:
                 return
 
         # Создание нового файла
         elif action.text() == "Новый файл":
+
             self.text.setText("")
 
         # Выбор шрифта
@@ -197,7 +200,7 @@ class Window(QMainWindow, QWidget):
         # Вставка текста
         elif action.text() == "Вставить":
             textt = QApplication.clipboard().text()
-            self.text.insertPlainText(textt + '\n')
+            self.text.insertPlainText(textt)
 
 def application():
     """ Создание оснвного метода """
